@@ -4,6 +4,10 @@ const {
 } = require("mongoose")
 
 const NotesSchema = new Schema({
+    user: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"noteUser"
+    },
     title: {
         type: String,
         required: true
@@ -15,7 +19,7 @@ const NotesSchema = new Schema({
     },
     tag: {
         type: String,
-        default:"general"
+        default: "general"
     },
     date: {
         type: Date,
