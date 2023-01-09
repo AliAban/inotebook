@@ -1,0 +1,16 @@
+Front End:-
+vite - create App
+React-router-dom - routing
+useLocation in React-router-dom 
+
+
+Back End:-
+nodejs
+express 
+express-router
+express-validator
+mongoose - connecting db
+Bcrypt- authentication
+jsonwebtoken 
+concurrently - added to scripts, used to run the frontend and backend together
+
