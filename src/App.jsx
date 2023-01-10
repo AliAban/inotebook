@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import NoteState from "./context/notes/NoteState";
 import About from "./components/About";
+import Alert from "./components/Alert";
 
 // import "./App.css";
 
@@ -12,10 +13,11 @@ function App() {
     <NoteState>
       <Router>
         <Navbar />
+        <Alert message="feeling Amazing"/>
         <div className="container">
           <Routes>
             <Route exact path="/" element={<Home />} />
-            <Route exact path="/about" element={<About />} />
+            {/* <Route exact path="/about" element={<About />} /> */}
           </Routes>
         </div>
       </Router>
