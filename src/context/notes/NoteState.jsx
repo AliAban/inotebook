@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef} from "react";
 import NoteContext from "./noteContext";
 
 const NoteState = (props) => {
@@ -29,7 +29,7 @@ const NoteState = (props) => {
   const addNote = async (title, description, tag) => {
     // API CALL to add the note to db
     const response = await fetch(`${host}/api/notes/addNote`, {
-      method: "GET", // *GET, POST, PUT, DELETE, etc.
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
 
       headers: {
         "Content-Type": "application/json",
@@ -38,19 +38,12 @@ const NoteState = (props) => {
       },
       body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
     });
-    const json = await response.json(); // parses JSON response into native JavaScript objects
-    console.log(json);
+    const addedNote = await response.json(); // parses JSON response into native JavaScript objects
+    console.log(addedNote);
+
     // client side logic
-    const newNote = {
-      _id: "63b199e6b3ce28e172fdf811",
-      user: "63b14cba6b4b59b51ed5ad46",
-      title: title,
-      description: description,
-      tag: tag,
-      date: "2023-01-01T14:34:14.994Z",
-      __v: 0,
-    };
-    setNotes(notes.concat(newNote));
+   
+    setNotes(notes.concat(addedNote));
     console.log("Adding a new note !");
   };
 
@@ -62,12 +55,13 @@ const NoteState = (props) => {
 
       headers: {
         "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
       },
     });
     const json = await response.json();
 
-    console.log("deleting a the node with id" + NoteId + " response: " +json);
+    console.log("deleting a the node with id" + NoteId + " response: " + json);
     const newNotes = notes.filter((note) => {
       return note._id !== NoteId;
     });
@@ -76,32 +70,81 @@ const NoteState = (props) => {
 
   // Edit a note
   const editNote = async (NoteId, title, description, tag) => {
-    // API CALL
-    const response = await fetch(`${host}/api/notes/updateNote/${NoteId}`, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
+    try {
+      // API CALL
+      const response = await fetch(`${host}/api/notes/updateNote/${NoteId}`, {
+        method: "PUT", // *GET, POST, PUT, DELETE, etc.
 
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
-      },
-      body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
-    });
-    const json = await response.json();
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token":
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+        },
+        body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
+      });
+      const json = await response.json();
+      console.log(json);
 
-    // logic to edit in client side
-    for (let index = 0; index < notes.length; index++) {
-      const element = notes[index];
-      if (element._id === id) {
-        element.title = title;
-        element.description = description;
-        element.tag = tag;
-      }
+    getAllNotes(); 
+    } catch (error) {
+      console.error(error)
     }
   };
 
+  //Adding a note
+  const [note, setSingleNote] = useState({ title: "", description: "", tag:""});
+
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    // if(note.title.length < 3 || note.description.length < 5){
+    //   alert("title should have min 3 characters and description should have min 5 characters!")
+    //   console.log("title should have min 3 characters and description should have min 5 characters!")
+    // }
+    addNote(note.title, note.description, note.tag);
+    setSingleNote({title: "", description: "", tag:""})
+   console.log(localStorage.getItem("token"));
+  };
+  const handleOnChange = (e) => {
+    setSingleNote({ ...note, [e.target.name]: e.target.value }); // ...note is spread operator, it says that all the value which are there in note will stay, and the values after that if not present in note should be added to the note or if already there should be updated
+  };
+
+  //editing a note
+  const [edtNote, setEdtNote] = useState({
+    id:"",
+    edtTitle: "",
+    edtDescription: "",
+    edtTag: "general",
+  });
+  const refCloseModal = useRef(null);
+
+  const handleEditNote = (note_id) => {
+    // e.preventDefault();
+    console.log(`preview: ${edtNote}` + edtNote.edtTitle);
+    editNote(note_id, edtNote.edtTitle, edtNote.edtDescription, edtNote.edtTag);
+    refCloseModal.current.click();
+  };
+
+  const handleOnChangeEditNote = (e) => {
+    setEdtNote({ ...edtNote, [e.target.name]: e.target.value }); // ...note is spread operator, it says that all the value which are there in note will stay, and the values after that if not present in note should be added to the note or if already there should be updated
+  };
   return (
     <NoteContext.Provider
-      value={{ notes, editNote, deleteNote, addNote, getAllNotes }}
+      value={{
+        notes,
+        note,
+        edtNote,
+        setEdtNote,
+        handleAddNote,
+        setSingleNote,
+        handleEditNote,
+        handleOnChange,
+        handleOnChangeEditNote,
+        editNote,
+        deleteNote,
+        addNote,
+        getAllNotes,
+        refCloseModal
+      }}
     >
       {props.children}
     </NoteContext.Provider>

@@ -53,15 +53,9 @@ const Navbar = () => {
             </li>
           </ul>
           <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button className="btn btn-outline-success" type="submit">
-              Search
-            </button>
+          {localStorage.getItem("token") && <a className="btn btn-primary mx-2" href="#">Logout</a>}
+           {!localStorage.getItem("token") && <Link className="btn btn-primary mx-2" to={"/login"}>Login</Link>}
+            <Link className="btn btn-primary mx-2" to={"/signup"}>Signup</Link>
           </form>
         </div>
       </div>

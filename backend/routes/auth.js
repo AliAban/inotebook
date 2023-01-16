@@ -92,6 +92,7 @@ router.post("/login", [
     })
 ], async (req, res) => {
 
+    let success = false;
     //check for errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -115,6 +116,7 @@ router.post("/login", [
         //if does not exits send an error
         if (!user) {
             return res.status(400).json({
+                success,
                 error: "Please login with correct credentials"
             })
         }
@@ -126,6 +128,7 @@ router.post("/login", [
         //if password does not match
         if (!passwordCompare) {
             return res.status(400).json({
+                success,
                 error: "Please login with correct credentials"
             })
         }
@@ -141,7 +144,9 @@ router.post("/login", [
         const authToken = jwt.sign(data, JWT_SECRET);
 
         //sending authToken
+        success = true;
         res.json({
+            success,
             authToken
         });
 

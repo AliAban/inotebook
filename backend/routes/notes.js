@@ -23,9 +23,9 @@ router.get("/fetchAllNotes", fetchUser, async (req, res) => {
 
 
 //ROUTE 2 :Add a note using GET "/api/notes/addNote"
-router.get("/addNote", fetchUser, [
+router.post("/addNote", fetchUser, [
         body("title", "Enter a Title").isLength({
-            min: 5
+            min: 3
         }),
         body("description", "Enter atleast 5 characters").isLength({
             min: 5
@@ -60,7 +60,7 @@ router.get("/addNote", fetchUser, [
             console.log("note added successfully !")
 
         } catch (error) {
-            res.status(500).send("some error occured")
+            res.status(501).send("some error occured sorry" + error)
         }
     })
 
