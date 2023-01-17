@@ -1,15 +1,31 @@
-import React from "react";
+import React,{useContext} from "react";
+import noteContext from "../context/notes/noteContext";
 
 const Alert = (props) => {
+  const context = useContext(noteContext)
+  const {alert, showAlert} = context;
+
+  const toCapital = (word) => {
+    let temp = word.toLowerCase();
+    return temp.charAt(0).toUpperCase() + temp.slice(1);
+  };
   return (
-    <div  className="alert alert-warning alert-dismissible fade show" role="alert">
-      {props.message}
-      <button
-        type="button"
-         className="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+    <div style={{ height: "5vh" }}>
+      {alert && (
+        <div
+          className={`alert alert-${alert.type} alert-dismissible fade show`}
+          role="alert"
+        >
+          <strong>{toCapital(alert.type)}: </strong>
+          {alert.msg}
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
     </div>
   );
 };

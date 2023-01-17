@@ -1,8 +1,19 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import {  useNavigate } from "react-router-dom";
+import noteContext from "../context/notes/noteContext";
 
 const Login = () => {
+  const context = useContext(noteContext);
+  const { showAlert } = context;
+
+  // let location = useLocation;
   let navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
+
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -18,13 +29,14 @@ const Login = () => {
         password: credentials.password,
       }), // body data type must match "Content-Type" header
     });
-    const json = await response.json();
+    const json = await response.json(); //getting the response
     console.log(json);
     if (json.success) {
-      localStorage.setItem("token", json.authToken);
-      navigate("/");
+      localStorage.setItem("token", json.authToken); // setting the auth-token in local storage.
+      showAlert("Logged in successfully!", "success");
+      navigate("/"); // redirect to homepage
     } else {
-      alert("login error");
+      showAlert("Login Error!", "danger");
     }
   };
 
@@ -35,7 +47,7 @@ const Login = () => {
   return (
     <div className="container">
       <form className="my-5" onSubmit={handleLoginSubmit}>
-        <legend className="text-center">Login</legend>
+        <legend className="text-center">Login to continue</legend>
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
             Email address

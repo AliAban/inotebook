@@ -13,6 +13,8 @@ const fetchUser = require("../middleware/fetchUser")
 //declaring a secret that is to be signed with the token
 const JWT_SECRET = config.authentication.JWT_SECRET;
 
+
+
 //ROUTE 1:  create a user using : POST "api/auth/". no login required
 router.post("/createUser", [
     body("name", "Enter a valid name").isLength({
@@ -23,8 +25,8 @@ router.post("/createUser", [
         min: 5
     })
 ], async (req, res) => {
-    console.log(req.body);
 
+    let success = false;
 
     //check for errors
     const errors = validationResult(req);
@@ -43,7 +45,7 @@ router.post("/createUser", [
 
         //if user exits send status 400 and a error json
         if (user) {
-            return res.status(400).json({
+            return res.status(400).json({success,
                 error: "Sorry a user with this email already exists!"
             })
         }
@@ -72,8 +74,10 @@ router.post("/createUser", [
         const authToken = jwt.sign(data, JWT_SECRET);
         console.log(authToken);
 
+        success = true;
         console.log(user);
         res.json({
+            success,
             authToken
         });
     } catch (error) {

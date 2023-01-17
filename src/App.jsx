@@ -15,7 +15,7 @@ function App() {
     <NoteState>
       <Router>
         <Navbar />
-        <Alert message="feeling Amazing"/>
+        <Alert msg="hello"/>
         <div className="container">
           <Routes>
             <Route exact path="/" element={<Home />} />

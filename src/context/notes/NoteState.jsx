@@ -1,23 +1,53 @@
-import React, { useState, useRef} from "react";
+import React, { useState, useRef } from "react";
 import NoteContext from "./noteContext";
 
 const NoteState = (props) => {
   const host = "http://localhost:3000";
 
-  const initialNotes = [];
-  //setting state
-  const [notes, setNotes] = useState(initialNotes);
+  //setting state for user data
+  const [userData, setUserData] = useState({});
 
+  const getUserData =async ()=>{
+     //getting auth-token
+     const authToken = localStorage.getItem("token");
+     if (!authToken) {
+       showAlert("Authentication Failed", "danger");
+       return;
+     }
+ 
+     // API CALL to add the note to db
+     const response = await fetch(`http://localhost:3000/api/auth/getUser`, {
+       method: "POST", // *GET, POST, PUT, DELETE, etc.
+ 
+       headers: {
+         "Content-Type": "application/json",
+         "auth-token": authToken,
+       },
+     });
+     const UserData = await response.json();
+     setUserData(UserData);
+
+  } 
+
+  const initialNotes = [];
+  //setting state 
+  const [notes, setNotes] = useState(initialNotes);
   // fetch all notes
   const getAllNotes = async () => {
+    //getting auth-token
+    const authToken = localStorage.getItem("token");
+    if (!authToken) {
+      showAlert("Authentication Failed", "danger");
+      return;
+    }
+
     // API CALL to add the note to db
     const response = await fetch(`${host}/api/notes/fetchAllNotes`, {
       method: "GET", // *GET, POST, PUT, DELETE, etc.
 
       headers: {
         "Content-Type": "application/json",
-        "auth-token":
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+        "auth-token": authToken,
       },
     });
     const allNotes = await response.json(); // parses JSON response into native JavaScript objects
@@ -27,6 +57,12 @@ const NoteState = (props) => {
 
   // Adding a note
   const addNote = async (title, description, tag) => {
+    //getting auth-token
+    const authToken = localStorage.getItem("token");
+    if (!authToken) {
+      showAlert("Authentication Failed", "danger");
+      return;
+    }
     // API CALL to add the note to db
     const response = await fetch(`${host}/api/notes/addNote`, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -34,7 +70,7 @@ const NoteState = (props) => {
       headers: {
         "Content-Type": "application/json",
         "auth-token":
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+         authToken,
       },
       body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
     });
@@ -42,13 +78,20 @@ const NoteState = (props) => {
     console.log(addedNote);
 
     // client side logic
-   
+
     setNotes(notes.concat(addedNote));
     console.log("Adding a new note !");
   };
 
   // Deleting a note
   const deleteNote = async (NoteId) => {
+    //getting auth-token
+    const authToken = localStorage.getItem("token");
+    if (!authToken) {
+      showAlert("Authentication Failed", "danger");
+      return;
+    }
+
     // API CALL
     const response = await fetch(`${host}/api/notes/deleteNote/${NoteId}`, {
       method: "DELETE", // *GET, POST, PUT, DELETE, etc.
@@ -56,7 +99,7 @@ const NoteState = (props) => {
       headers: {
         "Content-Type": "application/json",
         "auth-token":
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+          authToken,
       },
     });
     const json = await response.json();
@@ -66,11 +109,18 @@ const NoteState = (props) => {
       return note._id !== NoteId;
     });
     setNotes(newNotes);
+    showAlert("Deleted The Note", "success");
   };
 
   // Edit a note
   const editNote = async (NoteId, title, description, tag) => {
     try {
+      //getting auth-token
+      const authToken = localStorage.getItem("token");
+      if (!authToken) {
+        showAlert("Authentication Failed", "danger");
+        return;
+      }
       // API CALL
       const response = await fetch(`${host}/api/notes/updateNote/${NoteId}`, {
         method: "PUT", // *GET, POST, PUT, DELETE, etc.
@@ -78,21 +128,25 @@ const NoteState = (props) => {
         headers: {
           "Content-Type": "application/json",
           "auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjNiMTRjYmE2YjRiNTliNTFlZDVhZDQ2In0sImlhdCI6MTY3MjU2MzkzOH0.CxsOInLXjfE_7GzC1aMYpp5tcEe6A7zhlRZ1lO1thHU",
+            authToken,
         },
         body: JSON.stringify({ title, description, tag }), // body data type must match "Content-Type" header
       });
       const json = await response.json();
       console.log(json);
 
-    getAllNotes(); 
+      getAllNotes();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
 
   //Adding a note
-  const [note, setSingleNote] = useState({ title: "", description: "", tag:""});
+  const [note, setSingleNote] = useState({
+    title: "",
+    description: "",
+    tag: "",
+  });
 
   const handleAddNote = (e) => {
     e.preventDefault();
@@ -101,8 +155,11 @@ const NoteState = (props) => {
     //   console.log("title should have min 3 characters and description should have min 5 characters!")
     // }
     addNote(note.title, note.description, note.tag);
-    setSingleNote({title: "", description: "", tag:""})
-   console.log(localStorage.getItem("token"));
+
+    //after adding the note clear the input fields
+    setSingleNote({ title: "", description: "", tag: "" });
+    showAlert("Note Has Been Added", "success");
+    console.log(localStorage.getItem("token"));
   };
   const handleOnChange = (e) => {
     setSingleNote({ ...note, [e.target.name]: e.target.value }); // ...note is spread operator, it says that all the value which are there in note will stay, and the values after that if not present in note should be added to the note or if already there should be updated
@@ -110,7 +167,7 @@ const NoteState = (props) => {
 
   //editing a note
   const [edtNote, setEdtNote] = useState({
-    id:"",
+    id: "",
     edtTitle: "",
     edtDescription: "",
     edtTag: "general",
@@ -122,17 +179,41 @@ const NoteState = (props) => {
     console.log(`preview: ${edtNote}` + edtNote.edtTitle);
     editNote(note_id, edtNote.edtTitle, edtNote.edtDescription, edtNote.edtTag);
     refCloseModal.current.click();
+    showAlert("Edited The Note", "success");
   };
 
   const handleOnChangeEditNote = (e) => {
     setEdtNote({ ...edtNote, [e.target.name]: e.target.value }); // ...note is spread operator, it says that all the value which are there in note will stay, and the values after that if not present in note should be added to the note or if already there should be updated
   };
+
+  // code for alert
+  const [alert, setAlert] = useState(null);
+  const showAlert = (message, type) => {
+    if (message === null) {
+      setAlert(null);
+      return;
+    }
+    setAlert({
+      msg: message,
+      type: type,
+    });
+
+    //after 3 seconds make the alert null.
+    setTimeout(() => {
+      setAlert(null);
+    }, 3000);
+  };
+
   return (
     <NoteContext.Provider
       value={{
+        alert,
         notes,
+        userData,
         note,
         edtNote,
+        refCloseModal,
+        showAlert,
         setEdtNote,
         handleAddNote,
         setSingleNote,
@@ -143,7 +224,7 @@ const NoteState = (props) => {
         deleteNote,
         addNote,
         getAllNotes,
-        refCloseModal
+        getUserData
       }}
     >
       {props.children}

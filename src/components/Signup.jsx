@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext} from "react";
 import { useFetcher, useNavigate } from "react-router-dom";
+import noteContext from "../context/notes/noteContext";
 
 const Signup = () => {
+
+  const context = useContext(noteContext);
+  const  {showAlert} = context;
+
   let navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     name: "",
@@ -28,9 +33,12 @@ const Signup = () => {
       }),
     });
     const json = await response.json();
-    if (json) {
+    if (json.success) {
       console.log(json);
       navigate("/login");
+      showAlert("Account Created successfully!", "success");
+    }else{
+      showAlert(json.error, "warning");
     }
   };
 
@@ -53,6 +61,8 @@ const Signup = () => {
             className="form-control"
             id="name"
             name="name"
+            required
+            minLength={3}
           />
         </div>
         <div className="mb-3">
@@ -67,6 +77,7 @@ const Signup = () => {
             id="email"
             name="email"
             aria-describedby="emailHelp"
+            required
           />
           <div id="emailHelp" className="form-text">
             We'll never share your email with anyone else.
@@ -83,6 +94,8 @@ const Signup = () => {
             className="form-control"
             id="password"
             name="password"
+            required
+            minLength={5}
           />
         </div>
         <div className="mb-3">
@@ -96,6 +109,8 @@ const Signup = () => {
             className="form-control"
             id="cPassword"
             name="cPassword"
+            required
+            minLength={3}
           />
         </div>
         <button type="submit" className="btn btn-primary">
