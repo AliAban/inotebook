@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import noteContext from "../context/notes/noteContext";
 import NoteItem from "./NoteItem";
 import AddNote from "./AddNote";
@@ -17,14 +17,13 @@ const Notes = () => {
     handleEditNote,
     handleOnChange,
     handleOnChangeEditNote,
-    refCloseModal
+    refCloseModal,
   } = context;
 
-
   useEffect(() => {
-    if(localStorage.getItem("token")){
+    if (localStorage.getItem("token")) {
       getAllNotes();
-    }else{
+    } else {
       navigate("/login");
     }
   }, []);
@@ -32,18 +31,28 @@ const Notes = () => {
   const updateNote = (currentNote) => {
     console.log(`updated the note, id: ${currentNote}`);
     setEdtNote({
-      id:currentNote._id,
+      id: currentNote._id,
       edtTitle: currentNote.title,
       edtDescription: currentNote.description,
       edtTag: currentNote.tag,
     });
-   
   };
+
+  //view the note in modal
+  const [viewNote, setViewNote] = useState({title:"", description:"", tag:""})
+  const viewNoteModal = (currentNote)=>{
+    setViewNote({
+      title: currentNote.title,
+      description: currentNote.description,
+      tag: currentNote.tag,
+    })
+  }
+
   return (
     <>
       <AddNote />
 
-      {/* modal */}
+      {/* edit note modal */}
       <div
         className="modal fade"
         id="staticBackdrop"
@@ -119,7 +128,10 @@ const Notes = () => {
                 Close
               </button>
               <button
-                disabled={edtNote.edtTitle.length < 5 || edtNote.edtDescription.length < 5} 
+                disabled={
+                  edtNote.edtTitle.length < 5 ||
+                  edtNote.edtDescription.length < 5
+                }
                 type="button"
                 className="btn btn-primary"
                 onClick={() => {
@@ -133,14 +145,57 @@ const Notes = () => {
         </div>
       </div>
 
-      <div className="container my-5 ">
+      {/* view note modal */}
+      <div
+        className="modal fade"
+        id="NoteViewModal"
+        tabIndex="-1"
+        aria-labelledby="NoteViewModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h1 className="modal-title fs-5" id="exampleModalLabel">
+                {viewNote.title}
+              </h1>
+              <span className="badge bg-secondary ms-3 d-block">{viewNote.tag}</span>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">{viewNote.description}</div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container my-5 card">
         <h2 className="my-4 text-center">Your Notes</h2>
         <div className="row d-flex justify-content-center my-3">
-          {notes.length === 0 ? "No notes to Display": notes.map((note) => {
-            return (
-              <NoteItem key={note._id} note={note} updateNote={updateNote} />
-            );
-          })}
+          {notes.length === 0
+            ? "No notes to Display"
+            : notes.map((note) => {
+                return (
+                  <NoteItem
+                    viewNoteModal={viewNoteModal}
+                    key={note._id}
+                    note={note}
+                    updateNote={updateNote}
+                  />
+                );
+              })}
         </div>
       </div>
     </>
