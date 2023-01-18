@@ -7,8 +7,8 @@ body {
 h1 {
   font-size: 3.2em;
 }
-h3{
-  margin: 0!important;
+.note{
+  cursor: pointer;
 }
 button {
   border-radius: 8px;

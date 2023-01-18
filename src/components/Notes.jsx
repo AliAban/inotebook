@@ -147,7 +147,7 @@ const Notes = () => {
 
       {/* view note modal */}
       <div
-        className="modal fade"
+        className="modal"
         id="NoteViewModal"
         tabIndex="-1"
         aria-labelledby="NoteViewModalLabel"

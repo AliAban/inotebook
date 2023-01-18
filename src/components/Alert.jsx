@@ -16,7 +16,6 @@ const Alert = (props) => {
           className={`alert alert-${alert.type} alert-dismissible fade show`}
           role="alert"
         >
-          <strong>{toCapital(alert.type)}: </strong>
           {alert.msg}
           <button
             type="button"

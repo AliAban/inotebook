@@ -36,7 +36,7 @@ const Login = () => {
       showAlert("Logged in successfully!", "success");
       navigate("/"); // redirect to homepage
     } else {
-      showAlert("Login Error!", "danger");
+      showAlert(json.error, "danger");
     }
   };
 
